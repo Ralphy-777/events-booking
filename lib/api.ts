@@ -1,6 +1,6 @@
 export const API_BASE =
   (process.env.NEXT_PUBLIC_API_BASE || '').trim().replace(/\/$/, '') ||
-  'https://event-backend-5-v9tx.onrender.com/api/user';
+  'https://eventpro-backend.onrender.com/api/user';
 
 export const APP_BASE =
   typeof window === 'undefined'
@@ -15,8 +15,10 @@ export const WS_BASE = API_BASE
 // Keep Render backend alive — ping every 10 minutes to prevent spin-down
 if (typeof window !== 'undefined') {
   const ping = () => fetch(`${API_BASE}/event-types/`).catch(() => {});
-  ping();
-  setInterval(ping, 10 * 60 * 1000);
+  if (API_BASE.includes('.onrender.com')) {
+    ping();
+    setInterval(ping, 10 * 60 * 1000);
+  }
 }
 
 async function refreshAccessToken(tokenKey: 'clientToken' | 'organizerToken'): Promise<string | null> {
