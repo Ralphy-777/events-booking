@@ -221,7 +221,7 @@ export default function ClientRegister() {
               </button>
               <button type="button" onClick={handleResend} disabled={resendCooldown > 0 || resendLoading}
                 className="w-full text-xs text-sky-400 hover:text-sky-300 disabled:text-slate-600 transition-colors">
-                {resendLoading ? 'Sending...' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Didn't receive a code? Resend"}
+                {resendLoading ? 'Sending...' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Didn’t receive a code? Resend"}
               </button>
               <button type="button" onClick={() => { setStep('form'); setError(''); setCode(''); setResendMsg(''); }}
                 className="w-full text-xs text-slate-500 hover:text-slate-300 transition-colors">
