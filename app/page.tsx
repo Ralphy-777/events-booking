@@ -11,12 +11,16 @@ interface Video {
   thumbnail_url: string; description: string; category: string; order: number;
 }
 
-const EVENTS = [
-  { name: 'Weddings', desc: 'Elegant ceremonies & receptions' },
-  { name: 'Birthdays', desc: 'Memorable celebrations for all ages' },
-  { name: 'Corporate', desc: 'Professional meetings & conferences' },
-  { name: 'Others', desc: 'Custom events & special occasions' },
-];
+interface EventType {
+  id: number;
+  event_type: string;
+  description: string;
+}
+
+interface Review {
+  id: number;
+  rating: number;
+}
 
 const FEATURES = [
   { title: 'Easy Booking', desc: 'Book your event in minutes with our streamlined process.' },
@@ -26,26 +30,40 @@ const FEATURES = [
   { title: 'Verified Reviews', desc: 'Read honest reviews from real clients who\'ve hosted events.' },
 ];
 
-const STATS = [
-  { value: '500+', label: 'Events Hosted' },
-  { value: '5.0', label: 'Avg. Rating' },
-  { value: '5', label: 'Event Types' },
-  { value: '100%', label: 'Satisfaction' },
-];
-
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [eventTypes, setEventTypes] = useState<EventType[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingVideos, setLoadingVideos] = useState(true);
   const { loggingOut, logout } = useLogout();
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem('clientToken'));
+    fetch(`${API_BASE}/event-types/`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setEventTypes(Array.isArray(data) ? data : []))
+      .catch(() => {});
+    fetch(`${API_BASE}/reviews/`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setReviews(Array.isArray(data) ? data : []))
+      .catch(() => {});
     fetch(`${API_BASE}/videos/`)
       .then(r => r.ok ? r.json() : [])
       .then(setVideos).catch(() => {})
       .finally(() => setLoadingVideos(false));
   }, []);
+
+  const averageRating = reviews.length > 0
+    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+    : '0.0';
+
+  const stats = [
+    { value: '500+', label: 'Events Hosted' },
+    { value: averageRating, label: 'Avg. Rating' },
+    { value: String(eventTypes.length), label: 'Event Types' },
+    { value: '100%', label: 'Satisfaction' },
+  ];
 
   const navLinks = isLoggedIn
     ? [
@@ -113,7 +131,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
-            {STATS.map(s => (
+            {stats.map(s => (
               <div key={s.label} className="rounded-xl p-4 text-center"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <p className="text-2xl font-black text-white">{s.value}</p>
@@ -140,18 +158,21 @@ export default function Home() {
             <p className="text-slate-400 max-w-md mx-auto">From intimate gatherings to grand celebrations — we handle it all.</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {EVENTS.map((e) => (
-              <div key={e.name} className="rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 cursor-default"
+            {eventTypes.map((e) => (
+              <div key={e.id} className="rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 cursor-default"
                 style={{ background: 'rgba(14,165,233,0.06)', border: '1px solid rgba(14,165,233,0.15)' }}>
                 <div className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center"
                   style={{ background: 'rgba(14,165,233,0.15)', border: '1px solid rgba(14,165,233,0.3)' }}>
                   <div className="w-3 h-3 rounded-full" style={{ background: '#0ea5e9' }} />
                 </div>
-                <p className="font-bold text-white text-sm mb-1">{e.name}</p>
-                <p className="text-xs text-slate-400">{e.desc}</p>
+                <p className="font-bold text-white text-sm mb-1">{e.event_type}</p>
+                <p className="text-xs text-slate-400">{e.description || 'Custom event planning tailored to your celebration.'}</p>
               </div>
             ))}
           </div>
+          {eventTypes.length === 0 && (
+            <p className="text-center text-sm text-slate-500 mt-6">No event types available yet.</p>
+          )}
         </div>
       </section>
 

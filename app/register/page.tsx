@@ -8,6 +8,8 @@ const iStyle = { background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(1
 const iCls = "w-full px-4 py-3 rounded-xl text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-sky-500 transition-all text-sm";
 const lCls = "block text-xs font-bold text-sky-400 uppercase tracking-widest mb-2";
 
+const capitalize = (s: string) => s.trim().replace(/\b\w/g, c => c.toUpperCase());
+
 async function fetchWithRetry(url: string, options: RequestInit, retries = 2): Promise<Response> {
   for (let i = 0; i <= retries; i++) {
     try {
@@ -78,7 +80,7 @@ export default function ClientRegister() {
       const res = await fetchWithRetry(`${API_BASE}/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, date_of_birth: dob, address, email, password }),
+        body: JSON.stringify({ first_name: capitalize(firstName), last_name: capitalize(lastName), date_of_birth: dob, address, email, password }),
       });
       if (!res.ok) {
         setError(await getErrorMessage(res, 'Registration failed'));
@@ -257,10 +259,10 @@ export default function ClientRegister() {
 
           <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { label: 'First Name', value: firstName, setter: setFirstName, type: 'text', placeholder: 'First Name' },
-              { label: 'Last Name', value: lastName, setter: setLastName, type: 'text', placeholder: 'Last Name' },
-              { label: 'Date of Birth', value: dob, setter: setDob, type: 'date', placeholder: '' },
-              { label: 'Email Address', value: email, setter: setEmail, type: 'email', placeholder: 'your@email.com' },
+              { label: 'First Name', value: firstName, setter: (v: string) => setFirstName(capitalize(v)), type: 'text', placeholder: 'First Name' },
+              { label: 'Last Name', value: lastName, setter: (v: string) => setLastName(capitalize(v)), type: 'text', placeholder: 'Last Name' },
+              { label: 'Date of Birth', value: dob, setter: (v: string) => setDob(v), type: 'date', placeholder: '' },
+              { label: 'Email Address', value: email, setter: (v: string) => setEmail(v), type: 'email', placeholder: 'your@email.com' },
             ].map(f => (
               <div key={f.label}>
                 <label className={lCls}>{f.label}</label>
