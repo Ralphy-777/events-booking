@@ -15,6 +15,7 @@ interface Event {
   time: string;
   location: string;
   status: string;
+  image?: string | null;
 }
 
 export default function EventsPage() {
@@ -157,8 +158,13 @@ export default function EventsPage() {
                 className="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
 
-                {/* Top accent */}
-                <div className="h-1" style={{ background: 'linear-gradient(90deg, #0ea5e9, #0369a1)' }} />
+                {/* Event image or gradient banner */}
+                {event.image ? (
+                  <img src={event.image} alt={event.event_type}
+                    className="w-full object-cover" style={{ height: '160px' }} />
+                ) : (
+                  <div className="h-2" style={{ background: 'linear-gradient(90deg, #0ea5e9, #0369a1)' }} />
+                )}
 
                 <div className="p-5">
                   {/* Header */}
