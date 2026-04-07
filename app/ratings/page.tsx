@@ -56,7 +56,7 @@ export default function RatingsPage() {
       loadMyBookings(token);
       fetch(`${API_BASE}/reviews/guest-eligibility/`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.ok ? r.json() : {})
-        .then(d => { setGuestEligible(d.eligible ?? false); setGuestEventType(d.event_type ?? ''); })
+        .then((d: { eligible?: boolean; event_type?: string }) => { setGuestEligible(d.eligible ?? false); setGuestEventType(d.event_type ?? ''); })
         .catch(() => {});
     }
   }, []);
